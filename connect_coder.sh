@@ -1,16 +1,16 @@
 #!/bin/bash
 
 CODER_USER=""
-declare -A CODER_SSH_LIST=(
-	# ["API"] = "main.api.$CODER_USER.coder"
-	# Fill it with others
-)
 
-KEYS=("${!CODER_SSH_LIST[@]}")
+KEYS=()
+declare -A CODER_SSH_LIST=(
+	# [KEYS[i]]="Connection String"
+	# add others
+)
 
 echo "Environments:"
 i=1
-for key in "${!CODER_SSH_LIST[@]}"; do
+for key in "${KEYS[@]}"; do
 	echo "$i. $key"
 	((i++))
 done
@@ -29,4 +29,3 @@ fi
 
 selected_key="${KEYS[$((user_choice - 1))]}"
 ssh_host="${CODER_SSH_LIST[$selected_key]}"
-ssh "$ssh_host"
