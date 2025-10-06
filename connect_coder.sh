@@ -29,3 +29,12 @@ fi
 
 selected_key="${KEYS[$((user_choice - 1))]}"
 ssh_host="${CODER_SSH_LIST[$selected_key]}"
+
+read -p "Should forward port? [Y/N]: " foward_port
+
+if [[ "${foward_port,,}" == "y" ]]; then
+	read -p "Enter port number: " port
+	ssh -L "$port:localhost:$port" "$ssh_host"
+else
+	ssh "$ssh_host"
+fi
