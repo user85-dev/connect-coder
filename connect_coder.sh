@@ -2,7 +2,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-source "$(dirname "$0")/modules/select_coder_env.sh"
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+source "$SCRIPT_DIR/modules/select_coder_env.sh"
 
 select_environment
 
