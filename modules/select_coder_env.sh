@@ -2,12 +2,14 @@
 
 CODER_USER=""
 
-KEYS=()
-
-declare -A CODER_SSH_LIST=(
-	# [KEYS[i]]="Connection String"
-	# add others
+KEYS=(
 )
+
+declare -A CODER_SSH_LIST
+
+for key in "${KEYS[@]}"; do
+	CODER_SSH_LIST["$key"]="main.${key}.${CODER_USER}.coder"
+done
 
 select_environment() {
 	echo "Environments:"
