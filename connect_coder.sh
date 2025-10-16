@@ -8,25 +8,41 @@ source "$SCRIPT_DIR/modules/select_coder_env.sh"
 env_index=""
 port_arg=""
 forward_port=""
+skip_prompt="false"
 
-while getopts ":e:p:" opt; do
-	case ${opt} in
-	e)
-		env_index="$OPTARG"
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+	-e)
+		shift
+		env_index="$1"
+		shift
 		;;
-	p)
-		port_arg="$OPTARG"
+	-p)
+		shift
+		if [[ $# -gt 0 && "$1" =~ ^[0-9]+$ ]]; then
+			port_arg="$1"
+			shift
+		else
+			port_arg=""
+		fi
+		forward_port="y"
 		;;
-	\?)
-		echo "Invalid option: -$OPTARG" >&2
+	-np | --no-port)
+		skip_prompt="true"
+		forward_port="n"
+		shift
+		;;
+	-*)
+		echo "Invalid option: $1" >&2
 		exit 1
 		;;
-	:)
-		echo "Option -$OPTARG requires an argument." >&2
-		exit 1
+	*)
+		break
 		;;
 	esac
 done
+
+# echo "DEBUG: env_index=$env_index, forward_port=$forward_port, port_arg=$port_arg, skip_prompt=$skip_prompt"
 
 if [[ -n "$env_index" ]]; then
 	if ! [[ "$env_index" =~ ^[0-9]+$ ]]; then
@@ -47,19 +63,17 @@ else
 	select_environment
 fi
 
-if [[ -n "$port_arg" ]]; then
-	if ! [[ "$port_arg" =~ ^[0-9]+$ ]]; then
-		echo "Invalid port number: $port_arg"
-		exit 1
-	fi
-	forward_port="y"
-else
+if [[ "$skip_prompt" == "false" && -z "$forward_port" ]]; then
 	read -p "Should forward port? [Y/N]: " forward_port
 fi
 
 if [[ "${forward_port,,}" == "y" ]]; then
 	if [[ -z "$port_arg" ]]; then
 		read -p "Enter port number: " port_arg
+	fi
+	if ! [[ "$port_arg" =~ ^[0-9]+$ ]]; then
+		echo "Invalid port number: $port_arg"
+		exit 1
 	fi
 	ssh -L "$port_arg:localhost:$port_arg" "$ssh_host"
 else
