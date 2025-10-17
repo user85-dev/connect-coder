@@ -1,9 +1,8 @@
 #!/bin/bash
 
-CODER_USER=""
+CODER_USER=$(coder whoami | grep -Po '\w+\d+' | tail -n1)
 
-KEYS=(
-)
+readarray -t KEYS <<<"$(coder list | grep -Po "${CODER_USER}/\K[\w\-]+")"
 
 declare -A CODER_SSH_LIST
 
